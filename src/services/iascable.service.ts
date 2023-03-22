@@ -7,7 +7,7 @@ import {
     BillOfMaterialModule, BillOfMaterialEntry,
     Catalog, CatalogCategoryModel, CatalogLoader, ModuleSelector,
     CatalogBuilder, BundleWriterType, getBundleWriter, CustomResourceDefinition, SolutionModel
-} from '@cloudnativetoolkit/iascable';
+} from 'supercloud-lib';
 
 import {
     createNodeRedisClient,
