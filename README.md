@@ -101,8 +101,9 @@ A script has been provided to simplify this process. The steps to run the script
     ```
 5. Once these values are set it is now possible to run the application:
     ```shell
-    ❯ yarn install
-    ❯ yarn start:dev
+    ❯ npm install
+    ❯ npm run compile
+    ❯ npm run start:dev
     ```
 
 ## Deploy on OpenShift

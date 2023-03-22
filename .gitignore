@@ -18,3 +18,5 @@ tsconfig.tsbuildinfo
 # MacOS specific
 .DS_Store
 *.iml
+
+.env
