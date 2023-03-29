@@ -5,6 +5,10 @@ USER 1001
 WORKDIR /opt/app-root/src
 
 COPY --chown=1001 . .
+
+RUN chgrp -R 0 /opt/app-root && \
+    chmod -R g+rwX /opt/app-root
+    
 RUN npm install && \
     npm run compile
 
