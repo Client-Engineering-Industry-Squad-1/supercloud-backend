@@ -44,6 +44,7 @@ import {FILE_UPLOAD_SERVICE} from '../keys';
 import {FileUploadHandler, File} from '../types';
 import { IascableService } from '../services/iascable.service';
 import axios from 'axios';
+import { BillOfMaterialVariable, SolutionVariableModel } from 'supercloud-lib';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -445,6 +446,17 @@ This solution was built with the [Techzone Deployer](https://builder.techzone.ib
       return res.status(409).send(e?.message);
     }
 
+  }
+
+  @get('/solutions/{id}/variables')
+  async getSolutionVariables(
+      @param.path.string('id') id: string,
+      @inject(RestBindings.Http.RESPONSE) res: Response,
+  ): Promise<SolutionVariableModel[] | BillOfMaterialVariable[] | undefined> {
+    const solution = await this.solutionRepository.findById(id, { include: ['architectures'] });
+    const bomVariables = this.iascableService.getIascableBundleForSolution(solution)
+                        .then(bundle => bundle.results[0].billOfMaterial.spec.variables);
+    return bomVariables;
   }
 
   @patch('/solutions/{id}')

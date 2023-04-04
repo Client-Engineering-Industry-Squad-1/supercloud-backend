@@ -436,7 +436,7 @@ export class IascableService {
         return fs.readFileSync(`${process.cwd()}/.result.ignore.zip`);
     }
 
-    async buildSolution(solution: Solution) {
+    async getIascableBundleForSolution(solution: Solution) {
         let sol: SolutionModel;
         try {
             if (solution.yaml) {
@@ -473,6 +473,11 @@ export class IascableService {
         const catalogUrls: string[] = loadCatalogUrls([sol], catalogConfig.catalogUrls);
         const cat: Catalog = await this.catalogLoader.loadCatalog(catalogUrls);
         const iascableBundle = await this.catalogBuilder.buildBomsFromCatalog(cat, [sol]);
+        return iascableBundle;
+    }
+
+    async buildSolution(solution: Solution) {
+        const iascableBundle = await this.getIascableBundleForSolution(solution);
         const bundleWriter = iascableBundle.writeBundle(
             getBundleWriter(BundleWriterType.zip),
             { flatten: false, basePath: process.cwd() }
