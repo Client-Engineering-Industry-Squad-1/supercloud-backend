@@ -6,7 +6,8 @@ import {
     billOfMaterialFromYaml, isBillOfMaterialModel,
     BillOfMaterialModule, BillOfMaterialEntry,
     Catalog, CatalogCategoryModel, CatalogLoader, ModuleSelector,
-    CatalogBuilder, BundleWriterType, getBundleWriter, CustomResourceDefinition, SolutionModel
+    CatalogBuilder, BundleWriterType, getBundleWriter, CustomResourceDefinition, SolutionModel,
+    setInputVariables
 } from 'supercloud-lib';
 
 import {
@@ -429,7 +430,11 @@ export class IascableService {
 
         // Lets build a BOM file from the BOM builder
 
-        const iascableBundle = await this.catalogBuilder.buildBomsFromCatalog(cat, [bom]);
+        // FIXME: Expected 3-4 arguments, but got 2.
+        // variables = JSON STRING
+        const variables = '{"testKey":"testValue"}'
+        const inputVariables = setInputVariables(variables)
+        const iascableBundle = await this.catalogBuilder.buildBomsFromCatalog(cat, inputVariables, [bom]);
         const options = { flatten: false, basePath: process.cwd() };
         await iascableBundle.writeBundle(getBundleWriter(BundleWriterType.zip), options).generate('.result.ignore.zip');
 
@@ -470,9 +475,14 @@ export class IascableService {
                 description: arch.long_desc ?? arch.short_desc
             });
         }
+
+        // FIXME: Expected 3-4 arguments, but got 2.
+        const variables = '{"testKey":"testValue"}'
+        const inputVariables = setInputVariables(variables)
+        
         const catalogUrls: string[] = loadCatalogUrls([sol], catalogConfig.catalogUrls);
         const cat: Catalog = await this.catalogLoader.loadCatalog(catalogUrls);
-        const iascableBundle = await this.catalogBuilder.buildBomsFromCatalog(cat, [sol]);
+        const iascableBundle = await this.catalogBuilder.buildBomsFromCatalog(cat, inputVariables, [sol]);
         return iascableBundle;
     }
 
