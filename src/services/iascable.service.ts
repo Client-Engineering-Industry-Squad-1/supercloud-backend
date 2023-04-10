@@ -7,7 +7,6 @@ import {
     BillOfMaterialModule, BillOfMaterialEntry,
     Catalog, CatalogCategoryModel, CatalogLoader, ModuleSelector,
     CatalogBuilder, BundleWriterType, getBundleWriter, CustomResourceDefinition, SolutionModel,
-    setInputVariables,
     BillOfMaterialVariable
 } from 'supercloud-lib';
 
@@ -407,7 +406,7 @@ export class IascableService {
         }
     }
 
-    async buildTerraform(architecture: Architectures, boms: Bom[], drawio?: S3.Body, png?: S3.Body, variables?: BillOfMaterialVariable[]): Promise<Buffer> {
+    async buildTerraform(architecture: Architectures, boms: Bom[], drawio?: S3.Body, png?: S3.Body, variables?: BillOfMaterialVariable[] | undefined): Promise<Buffer> {
         //const catalog = await this.getCatalog();
 
         // Future : Push to Object Store, Git, Create a Tile Dynamically
@@ -438,7 +437,7 @@ export class IascableService {
         return fs.readFileSync(`${process.cwd()}/.result.ignore.zip`);
     }
 
-    async getIascableBundleForSolution(solution: Solution, variables?: BillOfMaterialVariable[]) {
+    async getIascableBundleForSolution(solution: Solution, variables?: BillOfMaterialVariable[] | undefined) {
         let sol: SolutionModel;
         try {
             if (solution.yaml) {

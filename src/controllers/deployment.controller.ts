@@ -9,6 +9,7 @@ import {
   import {
     param,
     get,
+    patch,
     getModelSchemaRef,
     response,
     post,
@@ -22,6 +23,7 @@ import {
   import {Deployment} from '../models';
   import { DeploymentRepository, SolutionRepository, ArchitecturesRepository } from '../repositories';
   import { IascableService } from '../services/iascable.service';
+  import { AnsibleAutomationService } from '../services/ansible-automation.service';
   import { BillOfMaterialVariable } from 'supercloud-lib';
   import { Inject } from 'typescript-ioc';
   
@@ -30,6 +32,7 @@ import {
   export class DeploymentController {
 
     @Inject iascableService!: IascableService;
+    @Inject ansibleAutomationService!: AnsibleAutomationService;
   
     constructor(
       @repository(DeploymentRepository)
@@ -106,13 +109,50 @@ import {
       return this.deploymentRepository.findById(id, filter);
     }
 
-  @get('/deployment/{id}/bundle.zip')
-  @oas.response.file()
-  async downloadBundleZip(
+    @patch('/deployment/{id}')
+    @response(200, {
+      description: 'Deployment model instance',
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(Deployment, {includeRelations: true}),
+        },
+      },
+    })
+    async updateById(
       @param.path.string('id') id: string,
+      @param.header.string('Authorization') authHeader: string,
       @inject(RestBindings.Http.RESPONSE) res: Response,
-      @param.filter(Deployment, {exclude: 'where'}) filter?: FilterExcludingWhere<Deployment>
-  ) {
+      @requestBody({
+        content: {
+          'application/json': {
+            schema: getModelSchemaRef(Deployment, { partial: true }),
+          },
+        },
+      }) deploymentReq: Deployment,
+    ) {
+        try {
+            const deployment = await this.deploymentRepository.findById(id);
+            if (deploymentReq?.state && deployment.state !== 'Deployed' && deploymentReq.state === 'Deployed') {
+                const result = await this.ansibleAutomationService.deploy(id, authHeader)
+                if (!result) {
+                    return res.status(500).send(`Unable to deploy deployment ${id}`);
+                }
+            }
+            await this.deploymentRepository.updateById(id, deploymentReq);
+            return await this.deploymentRepository.findById(id);
+        } catch (e:any) {
+            console.log(e);
+            return res.status(409).send(e?.message);
+        }
+    }
+
+    @get('/deployment/{id}/bundle.zip')
+    @oas.response.file()
+    async downloadBundleZip(
+        @param.path.string('id') id: string,
+        @inject(RestBindings.Http.RESPONSE) res: Response,
+        @param.filter(Deployment, {exclude: 'where'}) filter?: FilterExcludingWhere<Deployment>
+    ) {
 
     // Check if we have a deployment ID
     if (_.isUndefined(id)) {
