@@ -54,7 +54,7 @@
     "!*/__tests__"
   ],
   "dependencies": {
-    "supercloud-lib": "^0.1.5",
+    "supercloud-lib": "^0.1.6",
     "@loopback/boot": "^5.0.4",
     "@loopback/core": "^4.0.4",
     "@loopback/repository": "^5.0.4",

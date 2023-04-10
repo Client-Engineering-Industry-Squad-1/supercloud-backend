@@ -7,7 +7,8 @@ import {
     BillOfMaterialModule, BillOfMaterialEntry,
     Catalog, CatalogCategoryModel, CatalogLoader, ModuleSelector,
     CatalogBuilder, BundleWriterType, getBundleWriter, CustomResourceDefinition, SolutionModel,
-    setInputVariables
+    setInputVariables,
+    BillOfMaterialVariable
 } from 'supercloud-lib';
 
 import {
@@ -406,7 +407,7 @@ export class IascableService {
         }
     }
 
-    async buildTerraform(architecture: Architectures, boms: Bom[], drawio?: S3.Body, png?: S3.Body): Promise<Buffer> {
+    async buildTerraform(architecture: Architectures, boms: Bom[], drawio?: S3.Body, png?: S3.Body, variables?: BillOfMaterialVariable[]): Promise<Buffer> {
         //const catalog = await this.getCatalog();
 
         // Future : Push to Object Store, Git, Create a Tile Dynamically
@@ -430,18 +431,14 @@ export class IascableService {
 
         // Lets build a BOM file from the BOM builder
 
-        // FIXME: Expected 3-4 arguments, but got 2.
-        // variables = JSON STRING
-        const variables = '{"testKey":"testValue"}'
-        const inputVariables = setInputVariables(variables)
-        const iascableBundle = await this.catalogBuilder.buildBomsFromCatalog(cat, inputVariables, [bom]);
+        const iascableBundle = await this.catalogBuilder.buildBomsFromCatalog(cat, variables, [bom]);
         const options = { flatten: false, basePath: process.cwd() };
         await iascableBundle.writeBundle(getBundleWriter(BundleWriterType.zip), options).generate('.result.ignore.zip');
 
         return fs.readFileSync(`${process.cwd()}/.result.ignore.zip`);
     }
 
-    async getIascableBundleForSolution(solution: Solution) {
+    async getIascableBundleForSolution(solution: Solution, variables?: BillOfMaterialVariable[]) {
         let sol: SolutionModel;
         try {
             if (solution.yaml) {
@@ -476,18 +473,14 @@ export class IascableService {
             });
         }
 
-        // FIXME: Expected 3-4 arguments, but got 2.
-        const variables = '{"testKey":"testValue"}'
-        const inputVariables = setInputVariables(variables)
-        
         const catalogUrls: string[] = loadCatalogUrls([sol], catalogConfig.catalogUrls);
         const cat: Catalog = await this.catalogLoader.loadCatalog(catalogUrls);
-        const iascableBundle = await this.catalogBuilder.buildBomsFromCatalog(cat, inputVariables, [sol]);
+        const iascableBundle = await this.catalogBuilder.buildBomsFromCatalog(cat, variables, [sol]);
         return iascableBundle;
     }
 
-    async buildSolution(solution: Solution) {
-        const iascableBundle = await this.getIascableBundleForSolution(solution);
+    async buildSolution(solution: Solution, variables?: BillOfMaterialVariable[]) {
+        const iascableBundle = await this.getIascableBundleForSolution(solution, variables);
         const bundleWriter = iascableBundle.writeBundle(
             getBundleWriter(BundleWriterType.zip),
             { flatten: false, basePath: process.cwd() }

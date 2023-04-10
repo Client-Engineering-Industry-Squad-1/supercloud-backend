@@ -4,6 +4,7 @@ export * from './architectures.model';
 export * from './bom.model';
 export * from './services.model';
 export * from './control-mapping.model';
+export * from './deployment.model';
 export * from './goal.model';
 export * from './profile.model';
 export * from './mapping-goals.model';
