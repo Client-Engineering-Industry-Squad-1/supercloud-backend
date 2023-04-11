@@ -9,7 +9,7 @@ export class AnsibleAutomationService {
      * @returns Deployment object
      */
     async deploy(id: string, authHeader: string): Promise<boolean> {
-        const bundleUrl = `${process.env.APP_URL}/${id}/bundle.zip`
+        const bundleUrl = `${process.env.APP_URL}/deployment/${id}/bundle.zip`
         const ansibleDeployUrl = `${process.env.ANSIBLE_API_URL}/job_templates/${process.env.ANSIBLE_DEPLOY_JOB_TEMPLATE_ID}/launch/`
 
         try {
@@ -36,6 +36,7 @@ export class AnsibleAutomationService {
             })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 .then(() => {
+                    console.log(`Successfully sent job request for deployment ${id}`)
                     return true
                 })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
