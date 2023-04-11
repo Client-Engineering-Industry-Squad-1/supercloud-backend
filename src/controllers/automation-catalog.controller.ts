@@ -117,7 +117,7 @@ export class AutomationCatalogController {
       console.log(error);
     }
 
-    return this.iascableService.buildTerraform(architecture, automationBom, drawio, png);
+    return this.iascableService.buildTerraform(architecture, automationBom, [], drawio, png);
   }
 
   @get('/catalog/{id}')

@@ -414,7 +414,7 @@ This solution was built with the [Techzone Deployer](https://builder.techzone.ib
       // Create zip
       // const zip = new AdmZip();
 
-      return await this.iascableService.buildSolution(solution);
+      return await this.iascableService.buildSolution(solution, []);
 
       // // Add files from COS
       // try {
@@ -454,7 +454,7 @@ This solution was built with the [Techzone Deployer](https://builder.techzone.ib
       @inject(RestBindings.Http.RESPONSE) res: Response,
   ): Promise<SolutionVariableModel[] | BillOfMaterialVariable[] | undefined> {
     const solution = await this.solutionRepository.findById(id, { include: ['architectures'] });
-    const bomVariables = this.iascableService.getIascableBundleForSolution(solution)
+    const bomVariables = this.iascableService.getIascableBundleForSolution(solution, [])
                         .then(bundle => bundle.results[0].billOfMaterial.spec.variables);
     return bomVariables;
   }

@@ -406,7 +406,7 @@ export class IascableService {
         }
     }
 
-    async buildTerraform(architecture: Architectures, boms: Bom[], drawio?: S3.Body, png?: S3.Body, variables?: BillOfMaterialVariable[] | undefined): Promise<Buffer> {
+    async buildTerraform(architecture: Architectures, boms: Bom[], variables: BillOfMaterialVariable[], drawio?: S3.Body, png?: S3.Body): Promise<Buffer> {
         //const catalog = await this.getCatalog();
 
         // Future : Push to Object Store, Git, Create a Tile Dynamically
@@ -437,7 +437,7 @@ export class IascableService {
         return fs.readFileSync(`${process.cwd()}/.result.ignore.zip`);
     }
 
-    async getIascableBundleForSolution(solution: Solution, variables?: BillOfMaterialVariable[] | undefined) {
+    async getIascableBundleForSolution(solution: Solution, variables: BillOfMaterialVariable[]) {
         let sol: SolutionModel;
         try {
             if (solution.yaml) {
@@ -478,7 +478,7 @@ export class IascableService {
         return iascableBundle;
     }
 
-    async buildSolution(solution: Solution, variables?: BillOfMaterialVariable[]) {
+    async buildSolution(solution: Solution, variables: BillOfMaterialVariable[]) {
         const iascableBundle = await this.getIascableBundleForSolution(solution, variables);
         const bundleWriter = iascableBundle.writeBundle(
             getBundleWriter(BundleWriterType.zip),
