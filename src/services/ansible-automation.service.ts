@@ -21,7 +21,8 @@ export class AnsibleAutomationService {
             }
             const data = { 'extra_vars': JSON.stringify(extra_vars) }
 
-            axios({
+            console.log(`Creating job in Ansible for deploying: ${ansibleDeployUrl}`)
+            const isCreated = await axios({
                 method: 'post',
                 url: ansibleDeployUrl,
                 auth: {
@@ -33,12 +34,16 @@ export class AnsibleAutomationService {
                 },
                 data: data
             })
-                .then(() => {})
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .then(() => {
+                    return true
+                })
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 .catch(function (error: any) {
-                    throw Object.assign(new Error(error?.message), { code: 400 })
+                    console.log(error?.message)
+                    return false
                 })
-            return true
+            return isCreated
         } catch (error) {
             throw Object.assign(new Error(error), { code: 500 })
         }
