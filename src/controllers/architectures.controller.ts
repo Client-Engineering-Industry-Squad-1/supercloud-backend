@@ -373,8 +373,7 @@ export class ArchitecturesController {
     },
   })
   async find(): Promise<Architectures[]> {
-    const catalog = await this.iascableService.getCatalog();
-    const archs = (await this.architecturesRepository.find({ include: ["owners"], where: { public: true } })).filter(arch => catalog.boms.findIndex(catEntry => catEntry.name === arch.arch_id) >= 0);
+    const archs = (await this.architecturesRepository.find({ include: ["owners"] }));
     return archs;
   }
 
